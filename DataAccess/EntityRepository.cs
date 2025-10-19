@@ -35,7 +35,23 @@ namespace DataAccess
 
         public bool Delete(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                using (var context = new StudentsContext())
+                {
+                    var student = context.Students.FirstOrDefault(s => s.ID == id);
+                    if (student != null)
+                    {
+                        context.Students.Remove(student);
+                        return context.SaveChanges() > 0;
+                    }
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public List<Student> ReadAll()
@@ -44,25 +60,51 @@ namespace DataAccess
             {
                 using (var context = new StudentsContext())
                 {
-                    return context.Students.FirstOrDefault(s => s.ID == id);
-
+                    return context.Students.ToList();
                 }
             }
-            catch (Exception)
+            catch
             {
-
-                throw;
+                return new List<Student>();
             }
         }
 
         public Student ReadByID(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                using (var context = new StudentsContext())
+                {
+                    return context.Students.FirstOrDefault(s => s.ID == id);
+                }
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public bool Update(Student student)
         {
-            throw new NotImplementedException();
+            try
+            {
+                using (var context = new StudentsContext())
+                {
+                    var existingStudent = context.Students.FirstOrDefault(s => s.ID == student.ID);
+                    if (existingStudent != null)
+                    {
+                        existingStudent.Name = student.Name;
+                        existingStudent.Speciality = student.Speciality;
+                        existingStudent.Group = student.Group;
+                        return context.SaveChanges() > 0;
+                    }
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

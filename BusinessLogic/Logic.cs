@@ -7,165 +7,92 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Text.Json;
 using System.Threading;
+using DataAccess;
 
 namespace BusinessLogic
 {
     public class Logic
     {
-        //string filePath = @"C:\Users\evoj1\source\repos\Decan\BusinessLogic\students.json";
-        //List<Student> studentsData = new List<Student>();
-        //FileSystemWatcher watcher;
-        //bool suppressSave;
-
-        //public event EventHandler DataChanged;
-
-        //public Logic()
-        //{
-        //    EnsureFileExists();
-        //    LoadData();
-        //    InitializeFileWatcher();
-        //}
-
-        //public void LoadData()
-        //{
-        //    EnsureFileExists();
-        //    var json = File.ReadAllText(filePath);
-        //    List<Student> listFromFile = null;
-        //    if (!string.IsNullOrWhiteSpace(json))
-        //    {
-        //        try
-        //        {
-        //            listFromFile = JsonSerializer.Deserialize<List<Student>>(json);
-        //        }
-        //        catch
-        //        {
-        //            listFromFile = null;
-        //        }
-        //    }
-
-        //    suppressSave = true;
-        //    try
-        //    {
-        //        studentsData.Clear();
-        //        if (listFromFile != null)
-        //        {
-        //            foreach (var student in listFromFile)
-        //            {
-        //                studentsData.Add(student);
-        //            }
-        //        }
-        //    }
-        //    finally
-        //    {
-        //        suppressSave = false;
-        //    }
-
-        //    DataChanged?.Invoke(this, EventArgs.Empty);
-        //}
-
-        //public bool RemoveStudent(string name, string speciality, string group)
-        //{
-        //    if (studentsData == null)
-        //    {
-        //        Console.WriteLine("Ошибка: _studentsData равно null в RemoveStudent");
-        //        return false;
-        //    }
-
-        //    if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(speciality) || string.IsNullOrEmpty(group))
-        //    {
-        //        Console.WriteLine("Ошибка: одно из полей (name, speciality, group) равно null или пустое");
-        //        return false;
-        //    }
-
-        //    var toRemove = studentsData.FirstOrDefault(s => s != null &&
-        //                                                    s.Name == name &&
-        //                                                    s.Speciality == speciality &&
-        //                                                    s.Group == group);
-        //    if (toRemove != null)
-        //    {
-        //        studentsData.Remove(toRemove);
-        //        SaveData();
-        //        return true;
-        //    }
-
-        //    return false;
-        //}
-
-        //public List<string[]> GetAllStudentsData()
-        //{
-        //    return studentsData
-        //        .Where(s => s != null)
-        //        .Select(s => new[] { s.Name ?? "", s.Speciality ?? "", s.Group ?? "" })
-        //        .ToList();
-        //}
-
-        //public Dictionary<string, int> GetSpecialityDistribution()
-        //{
-        //    return studentsData
-        //        .Where(s => s != null && s.Speciality != null)
-        //        .GroupBy(s => s.Speciality)
-        //        .ToDictionary(g => g.Key, g => g.Count());
-        //}
-
-        //public bool AddStudent(string name, string speciality, string group)
-        //{
-        //    if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(speciality) || string.IsNullOrEmpty(group))
-        //    {
-        //        return false;
-        //    }
-
-        //    var newStudent = new Student(name, speciality, group);
-        //    studentsData.Add(newStudent);
-        //    SaveData();
-        //    return true;
-        //}
-
-        //private void SaveData()
-        //{
-        //    if (suppressSave) return;
-        //    File.WriteAllText(filePath, JsonSerializer.Serialize(studentsData));
-        //    DataChanged?.Invoke(this, EventArgs.Empty);
-        //}
-
-        //private void EnsureFileExists()
-        //{
-        //    if (!File.Exists(filePath))
-        //    {
-        //        var dir = Path.GetDirectoryName(filePath);
-        //        if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
-        //        {
-        //            Directory.CreateDirectory(dir);
-        //        }
-        //        File.WriteAllText(filePath, "[]");
-        //    }
-        //}
-
-        //private void InitializeFileWatcher()
-        //{
-        //    var dir = Path.GetDirectoryName(filePath);
-        //    var file = Path.GetFileName(filePath);
-        //    watcher = new FileSystemWatcher(dir, file)
-        //    {
-        //        NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName
-        //    };
-        //    watcher.Changed += OnFileChanged;
-        //    watcher.Created += OnFileChanged;
-        //    watcher.Renamed += OnFileChanged;
-        //    watcher.EnableRaisingEvents = true;
-        //}
-
-        //private void OnFileChanged(object sender, FileSystemEventArgs e)
-        //{
-        //    try
-        //    {
-        //        Thread.Sleep(50);
-        //        LoadData();
-        //        DataChanged?.Invoke(this, EventArgs.Empty);
-        //    }
-        //    catch (Exception)
-        //    {
-
-        //    }
-        //}
+        private IRepository _repository;
+        public event EventHandler DataChanged;
+        public Logic()
+        {
+            //_repository = new EntityRepository();
+            _repository = new DapperRepository();
+        }
+        public string GetRepositoryType()
+        {
+            return _repository.GetType().Name;
+        }
+        public bool AddStudent(string name, string speciality, string group)
+        {
+            if (string.IsNullOrWhiteSpace(name) ||
+                string.IsNullOrWhiteSpace(speciality) ||
+                string.IsNullOrWhiteSpace(group))
+            {
+                return false;
+            }
+            var newStudent = new Student
+            {
+                Name = name.Trim(),
+                Speciality = speciality.Trim(),
+                Group = group.Trim(),
+            };
+            var result = _repository.Create(newStudent);
+            if (result)
+            {
+                DataChanged?.Invoke(this, EventArgs.Empty);
+            }
+            return result;
+        }
+        public bool RemoveStudent(string name, string speciality, string group)
+        {
+            if (string.IsNullOrWhiteSpace(name) ||
+                string.IsNullOrWhiteSpace(speciality) ||
+                string.IsNullOrWhiteSpace(group))
+            {
+                return false;
+            }
+            var students = _repository.ReadAll();
+            var studentToRemove = students.FirstOrDefault(s => s.Name?.Trim().Equals(name.Trim(), StringComparison.OrdinalIgnoreCase) == true &&
+            s.Speciality?.Trim().Equals(speciality.Trim(), StringComparison.OrdinalIgnoreCase) == true &&
+            s.Group?.Trim().Equals(group.Trim(), StringComparison.OrdinalIgnoreCase) == true);
+            if (studentToRemove != null)
+            {
+                var result = _repository.Delete(studentToRemove.ID);
+                if (result)
+                {
+                    DataChanged?.Invoke(this, EventArgs.Empty) ;
+                }
+                return result;
+            }
+            return false;
+        }
+        public List<Student> GetAllStudents()
+        {
+            return _repository.ReadAll() ?? new List<Student>();
+        }
+        public List<string[]> GetAllStudentsData()
+        {
+            var students = GetAllStudents();
+            return students.Select(s => new string[]
+            {
+                s.Name ?? "",
+                s.Speciality ?? "",
+                s.Group ?? ""
+            }).ToList();
+        }
+        public Dictionary<string, int> GetSpecialityDistribution()
+        {
+            var students = GetAllStudents();
+            return students
+                .Where(s => !string.IsNullOrWhiteSpace(s.Speciality))
+                .GroupBy(s => s.Speciality.Trim())
+                .ToDictionary(g => g.Key, g => g.Count());
+        }
+        public void LoadData()
+        {
+            DataChanged?.Invoke(this, EventArgs.Empty);
+        }
     }
 }
