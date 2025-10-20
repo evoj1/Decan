@@ -5,15 +5,18 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using DataAccess;
 
 namespace ConsoleApp
 {
     internal class Program
     {
-        static Logic logic = new Logic();
-
+        
+        static Logic logic;
         static void Main(string[] args)
         {
+            
+            logic = new Logic();
             Console.WriteLine($"Репозиторий: {logic.GetRepositoryType()}\n");
 
             bool exit = true;

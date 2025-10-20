@@ -12,43 +12,11 @@ namespace DataAccess
     {
         public StudentsContext() : base("DefaultConnection")
         {
-            // Автоматически создать базу данных, если её нет
-            Database.SetInitializer(new DatabaseInitcs());
-
-            // Принудительная инициализация базы данных
-            Database.Initialize(false);
         }
+
+        //public DbSet<Student> Students { get; set; }
         public DbSet<Student> Students { get; set; }
-
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
-        {
-            // Настройка таблицы Students
-            modelBuilder.Entity<Student>()
-                .ToTable("Students")
-                .HasKey(s => s.ID);
-
-            modelBuilder.Entity<Student>()
-                .Property(s => s.ID)
-                .HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Identity);
-
-            modelBuilder.Entity<Student>()
-                .Property(s => s.Name)
-                .IsRequired()
-                .HasMaxLength(100);
-
-            modelBuilder.Entity<Student>()
-                .Property(s => s.Speciality)
-                .IsRequired()
-                .HasMaxLength(100);
-
-            modelBuilder.Entity<Student>()
-                .Property(s => s.Group)
-                .IsRequired()
-                .HasMaxLength(50)
-                .HasColumnName("Group");  // Явно указываем имя колонки
-
-            base.OnModelCreating(modelBuilder);
-        }
+    }
         public class EntityRepository : IRepository
         {
             public bool Create(Student student)
