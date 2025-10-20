@@ -11,6 +11,7 @@ namespace ConsoleApp
     internal class Program
     {
         static Logic logic = new Logic();
+
         static void Main(string[] args)
         {
             Console.WriteLine($"Репозиторий: {logic.GetRepositoryType()}\n");

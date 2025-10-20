@@ -16,7 +16,7 @@ namespace DataAccess
         private string _connectionString;
         public DapperRepository()
         {
-            _connectionString = ConfigurationManager.ConnectionStrings["DefaulConnection"].ConnectionString;
+            _connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
         }
 
         public bool Create(Student student)

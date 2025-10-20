@@ -1,13 +1,15 @@
-﻿using Model;
+﻿using DataAccess;
+using Model;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text.Json;
 using System.Threading;
-using DataAccess;
+using static DataAccess.StudentsContext;
 
 namespace BusinessLogic
 {
@@ -17,8 +19,8 @@ namespace BusinessLogic
         public event EventHandler DataChanged;
         public Logic()
         {
-            //_repository = new EntityRepository();
-            _repository = new DapperRepository();
+            _repository = new EntityRepository();
+            //_repository = new DapperRepository();
         }
         public string GetRepositoryType()
         {
