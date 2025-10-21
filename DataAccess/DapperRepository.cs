@@ -42,7 +42,7 @@ namespace DataAccess
             {
                 using (var connection = new SqlConnection(_connectionString))
                 {
-                    var sql = "DELETE FROM Students WHERE Id = @ID";
+                    var sql = "DELETE FROM Students WHERE Id = @Id";
                     var result = connection.Execute(sql, new { Id = id });
                     return result > 0;
                 }
@@ -75,7 +75,7 @@ namespace DataAccess
             {
                 using (var connection = new SqlConnection(_connectionString))
                 {
-                    var sql = "SELECT Id, Name, Speciality, [Group] FROM Students WHERE Id = @ID";
+                    var sql = "SELECT Id, Name, Speciality, [Group] FROM Students WHERE Id = @Id";
                     return connection.QueryFirstOrDefault<Student>(sql, new { Id = id });
                 }
             }
@@ -93,7 +93,7 @@ namespace DataAccess
                 {
                     var sql = "UPDATE Students SET Name = @Name," +
                         "Speciality = @Speciality," +
-                        "[Group] = @Group WHERE Id = @ID";
+                        "[Group] = @Group WHERE Id = @Id";
                     var result = connection.Execute(sql, student);
                     return result > 0;
                 }

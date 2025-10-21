@@ -11,11 +11,11 @@ namespace ConsoleApp
 {
     internal class Program
     {
-        
         static Logic logic;
+        
         static void Main(string[] args)
         {
-            
+            EntityRepository entityRepository = new EntityRepository();
             logic = new Logic();
             Console.WriteLine($"Репозиторий: {logic.GetRepositoryType()}\n");
 
